@@ -1,5 +1,3 @@
-const db = require('./db.js')
-
 const express = require('express')
 const bcrypt = require('bcrypt')
 const app = express()
@@ -50,6 +48,21 @@ app.post('/users', async function(req, res) {
    });
 
 
+app.get('/users/:id', async function(req, res) {
+    let connection = await getConnection()
+    let sql = `SELECT * FROM users WHERE id = ?`
+    let [results] = await connection.execute(sql, [req.params.id])
+    res.json(results)
+});
+
+app.get('/users', async function(req, res) {
+    let connection = await getConnection()
+    let sql = `SELECT * FROM users`
+    let [results] = await connection.execute(sql)
+    res.json(results)
+});
+
+
 app.post('/login', async function(req, res) {
     let connection = await getConnection()
     let sql = `SELECT * FROM users WHERE username = ?`
@@ -65,8 +78,8 @@ app.post('/login', async function(req, res) {
     }
 });
    
-app.get('/greet', (req, res) => {
-    res.send(`<h1>Hej ${req.query.name}</h1>`)
+app.get('/', (req, res) => {
+    res.send(`<p>Get/users - returnerar alla användare</p><br><p>Get/users/:id - returnerar en användare med angivet id</p><br><p>Post/users - skapar en ny användare, accepterar JSON objekt på formatet {"username": "unikt namn", "password": ""}</p><br><p>Post/login - loggar in en användare, accepterar JSON objekt på formatet "username": "", "password": ""</p>`)
 })
 
 
